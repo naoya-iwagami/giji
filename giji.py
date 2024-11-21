@@ -6,15 +6,21 @@ import streamlit as st
 # ページの設定をwideにする  
 st.set_page_config(layout="wide")  
 
-# 環境変数からAPIキーを取得  
-api_key = os.getenv("OPENAI_API_KEY")  
+# 環境変数からAPIキーとエンドポイントを取得  
+api_key = os.getenv("AZURE_OPENAI_KEY")  
+api_base = os.getenv("AZURE_OPENAI_ENDPOINT")
+
 if api_key is None:  
     st.error("APIキーが設定されていません。環境変数OPENAI_API_KEYを設定してください。")  
-    st.stop()  
+    st.stop()
+
+if api_base is None:
+    st.error("APIエンドポイントが設定されていません。環境変数OPENAI_API_BASEを設定してください。")  
+    st.stop()
 
 # OpenAI APIの設定  
 openai.api_type = "azure"  
-openai.api_base = "https://test-chatgpt-pm-1.openai.azure.com/"  
+openai.api_base = api_base  # 環境変数から取得したAPIエンドポイントを設定
 openai.api_version = "2023-03-15-preview"  
 openai.api_key = api_key
 
