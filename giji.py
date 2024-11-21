@@ -35,7 +35,7 @@ def read_docx(file):
         st.error(f"Error reading docx file: {e}")
         return None
 
-def create_summary(full_text, system_message, temperature):  
+def create_summary(full_text, system_message, temperature, top_p):  
     try:  
         user_message = f"全文:\n{full_text}"
 
@@ -46,6 +46,7 @@ def create_summary(full_text, system_message, temperature):
                 {"role": "user", "content": user_message}  
             ],  
             temperature=temperature,  # 温度を設定
+            top_p=top_p,  # 上位Pを設定
             max_tokens=16000  # 最大トークン数に合わせて調整
         )  
         summary = response["choices"][0]["message"]["content"]
@@ -87,6 +88,15 @@ temperature = st.slider(
     step=0.1
 )
 
+# 上位Pのスライダー設定
+top_p = st.slider(
+    "上位Pを設定してください（0は最も確率が高いトークンのみを選択、1は完全に確率に基づくランダムな選択を許可します）:",
+    min_value=0.0, 
+    max_value=1.0, 
+    value=1.0, 
+    step=0.1
+)
+
 # 複数ファイルのアップロード
 uploaded_files = st.file_uploader("ファイルをアップロード (最大3つ)", type="docx", accept_multiple_files=True)  
 
@@ -118,7 +128,7 @@ if uploaded_files:
         if st.button('議事録を作成'):
             if all_texts:
                 # 議事録を作成  
-                summary = create_summary(all_texts, system_message, temperature)
+                summary = create_summary(all_texts, system_message, temperature, top_p)
                 st.write(summary)
             else:  
                 st.error("ファイルの読み込みに失敗しました。")  
